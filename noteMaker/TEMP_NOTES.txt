@@ -1,0 +1,4 @@
+Client Name~Time In~Time Out~Location~Service Type~Signed~Not Signed~Notes
+Mathew Admin~5:00 AM~5:00 AM~Primary Location~20-Admin~false~true~;klajshd ouiwh tocivaklgj [owerit yhclkvna ;lkawe ]tpiouj;dcgvasdtfsd ~
+Little Debbie~5:00 AM~5:00 AM~Primary Location~4-Behavior Therapy, BA WV~false~true~;klajshd ouiwh tocivaklgj [owerit yhc~
+Anyone Here~5:00 AM~5:00 AM~Primary Location~16-Private Day Camp~false~true~;klajshd ouiwh tocivaklgj [owerit yhclkvna ;lkawe ]tpiouj;dcgvasdtfsd ;klajshd ouiwh tocivaklgj [owerit yhclkvna ;lkawe ]tpiouj;dcgvasdtfsd ;klajshd ouiwh tocivaklgj [owerit yhclkvna ;lkawe ]tpiouj;dcgvasdtfsd ;klajshd ouiwh tocivaklgj [owerit yhclkvna ;lkawe ]tpiouj;dcgvasdtfsd ;klajshd ouiwh tocivaklgj [owerit yhclkvna ;lkawe ]tpiouj;dcgvasdtfsd ;klajshd ouiwh tocivaklgj [owerit yhclkvna ;lkawe ]tpiouj;dcgvasdtfsd ~
