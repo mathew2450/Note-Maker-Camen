@@ -1,10 +1,8 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-
 import javax.swing.*;
 import javax.swing.border.*;
-
 import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -35,7 +33,10 @@ public class NoteMaker extends JPanel{
 	ArrayList<JCheckBox> notSigned = new ArrayList<JCheckBox>();
 	ArrayList<JTextField> clientNames = new ArrayList<JTextField>();
 	ArrayList<JTextField> employeeNames = new ArrayList<JTextField>();
-	ArrayList<JTextArea> notes = new ArrayList<JTextArea>();
+	ArrayList<JTextArea> seshFocus = new ArrayList<JTextArea>();
+	ArrayList<JTextArea> theraInt = new ArrayList<JTextArea>();
+	ArrayList<JTextArea> plandInt = new ArrayList<JTextArea>();
+	
 
 	 ArrayList<JFormattedTextField> signitures = new ArrayList<JFormattedTextField>();
 	@SuppressWarnings("rawtypes")
@@ -63,44 +64,58 @@ public class NoteMaker extends JPanel{
 					"19-Private Level 3","20-Admin"};
 	JComboBox<String> serviceTypeSelect;
 	
-	public NoteMaker(){
+	public NoteMaker() {
 		super(new BorderLayout());
-		
         send = new Send();
         newNote = new NewNote();
+        
+        JLabel contentPane = new JLabel();
+        ImageIcon icon = new ImageIcon("camenLogo.png");
+        contentPane.setIcon(icon);
+        contentPane.setOpaque(true);
+        mainPanel.add(contentPane);
         
         JButton addNote = new JButton(newNote);
         addNote.setText("Add A New Note");
         JButton sendNote = new JButton(send);
         sendNote.setText("Send Note");
    
-        BoxLayout layout = new BoxLayout(mainPanel, BoxLayout.Y_AXIS);
-        mainPanel.setLayout(layout);
+        //BoxLayout layout = new BoxLayout(mainPanel, BoxLayout.Y_AXIS);
+        //mainPanel.setLayout(layout);
         //mainPanel.add(createYAlignmentExample());
-        Dimension maxsize = new Dimension(2000, 10000);
-        Dimension minsize = new Dimension(2000, 50);
+        Dimension maxsize = new Dimension(1700, 5000);
+        Dimension minsize = new Dimension(1700, 50);
         mainPanel.setMaximumSize(maxsize);
         mainPanel.setMinimumSize(minsize);
         mainPanel.setPreferredSize(maxsize);
+        mainPanel.setBackground(Color.white);
+        mainPanel.setOpaque(true);
         JScrollPane scrollPane = new JScrollPane(mainPanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setForeground(Color.white);
+        addNote.setBackground(Color.white);
+        sendNote.setBackground(Color.white);
+        //add(contentPane, BorderLayout.PAGE_START);
         add(scrollPane, BorderLayout.CENTER);
         add(addNote, BorderLayout.NORTH);       
         add(sendNote, BorderLayout.SOUTH);
+        setBackground(Color.white);
+        this.setForeground(Color.white);
 	}
 	
 	protected JPanel createClientInfoPanel() {
         JPanel pane = new JPanel();
-        String title = "Note";
         
         JComponent minipanel = new JPanel();
-        Dimension size = new Dimension(1650, 220);
+        Dimension size = new Dimension(1300, 220);
         minipanel.setAlignmentX(LEFT_ALIGNMENT);
         minipanel.setMaximumSize(size);
         minipanel.setPreferredSize(size);
         minipanel.setMinimumSize(size);
+        minipanel.setBackground(new Color(152,215,215));
+        
         TitledBorder border = new TitledBorder(
                                   new LineBorder(Color.black),
                                   "",
@@ -108,44 +123,87 @@ public class NoteMaker extends JPanel{
                                   TitledBorder.BELOW_TOP);
         border.setTitleColor(Color.black);
         minipanel.setBorder(border);
-        minipanel.add(new JLabel("Employee Name:"));
+        
         employeeNames.add(clientNum, new JTextField(12));
-        employeeNames.get(clientNum).setToolTipText("FirstName LastName");
-        minipanel.add(employeeNames.get(clientNum));	
-        minipanel.add(new JLabel("Client Name:"));
+        employeeNames.get(clientNum).setToolTipText("FirstName LastName");        
+        employeeNames.get(clientNum).setBorder(BorderFactory.createTitledBorder(new LineBorder(Color.black),"Employee Name",TitledBorder.LEFT,TitledBorder.ABOVE_TOP)); 
+        employeeNames.get(clientNum).setBackground(new Color(152,215,215));
+        minipanel.add(employeeNames.get(clientNum));
+        
         clientNames.add(clientNum, new JTextField(12));
         clientNames.get(clientNum).setToolTipText("FirstName LastName");
+        clientNames.get(clientNum).setBorder(BorderFactory.createTitledBorder(new LineBorder(Color.black),"Client Name",TitledBorder.LEFT,TitledBorder.ABOVE_TOP)); 
+        clientNames.get(clientNum).setBackground(new Color(152,215,215));
         minipanel.add(clientNames.get(clientNum));
-        minipanel.add(new JLabel("Time In:"));
+        
         timeIn.add(clientNum, timeSelect = new JComboBox<String>(time));
+        timeIn.get(clientNum).setBorder(BorderFactory.createTitledBorder("Time In"));
+        timeIn.get(clientNum).setBackground(new Color(152,215,215));
         minipanel.add(timeIn.get(clientNum));
-        minipanel.add(new JLabel("Time Out:"));
+        
         timeOut.add(clientNum, timeSelect = new JComboBox<String>(time));
+        timeOut.get(clientNum).setBorder(BorderFactory.createTitledBorder("Time Out"));
+        timeOut.get(clientNum).setBackground(new Color(152,215,215));
         minipanel.add(timeOut.get(clientNum));
-        minipanel.add(new JLabel("Location:"));
+        
         locations.add(clientNum, locationSelect = new JComboBox<String>(location));
+        locations.get(clientNum).setBorder(BorderFactory.createTitledBorder("Location"));
+        locations.get(clientNum).setBackground(new Color(152,215,215));
         minipanel.add(locations.get(clientNum));
-        minipanel.add(new JLabel("Service Type:"));
+        
         serviceTypes.add(clientNum, serviceTypeSelect = new JComboBox<String>(serviceType));
+        serviceTypes.get(clientNum).setBorder(BorderFactory.createTitledBorder("Service Type"));
+        serviceTypes.get(clientNum).setBackground(new Color(152,215,215));
         minipanel.add(serviceTypes.get(clientNum));
-        minipanel.add(new JLabel("Signiture:"));
         
-        signed.add(clientNum, new JCheckBox("Signed"));
-        signed.get(clientNum).setEnabled(false);
-        minipanel.add(signed.get(clientNum));
-        notSigned.add(clientNum, new JCheckBox("Not Signed"));
-        notSigned.get(clientNum).setSelected(true);
-        notSigned.get(clientNum).setEnabled(false);
-        minipanel.add(notSigned.get(clientNum));
+        signed.add(clientNum, new JCheckBox("Check Here to Sign"));
+        signed.get(clientNum).setBorder(BorderFactory.createLineBorder(Color.black));
+        signed.get(clientNum).setBackground(new Color(152,215,215));
+        minipanel.add(signed.get(clientNum));       
         
-        minipanel.add(new JLabel("Notes:"));
-        notes.add(clientNum, new JTextArea(10, 100)); 
-        notes.get(clientNum).setLineWrap(true);
-        notes.get(clientNum).setToolTipText("Please Put Detailed Notes!");
-        minipanel.add(notes.get(clientNum));        
+        seshFocus.add(clientNum, new JTextArea(5, 30)); 
+        seshFocus.get(clientNum).setLineWrap(true);
+        seshFocus.get(clientNum).setWrapStyleWord(true);
+        seshFocus.get(clientNum).setToolTipText("Please Put Detailed Notes!");
+        JScrollPane scrollPane = new JScrollPane(seshFocus.get(clientNum)); 
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Session Focus"));
+        scrollPane.setBackground(new Color(152,215,215));
+        minipanel.add(scrollPane); 
+        
+        theraInt.add(clientNum, new JTextArea(5, 30)); 
+        theraInt.get(clientNum).setLineWrap(true);
+        theraInt.get(clientNum).setWrapStyleWord(true);
+        theraInt.get(clientNum).setToolTipText("Please Put Detailed Notes!");
+        JScrollPane scrollPane2 = new JScrollPane(theraInt.get(clientNum)); 
+        scrollPane2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane2.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane2.setBorder(BorderFactory.createTitledBorder("Theraeputic Intervention"));
+        scrollPane2.setBackground(new Color(152,215,215));
+        minipanel.add(scrollPane2);
+        
+        plandInt.add(clientNum, new JTextArea(5, 30)); 
+        plandInt.get(clientNum).setLineWrap(true);
+        plandInt.get(clientNum).setWrapStyleWord(true);
+        plandInt.get(clientNum).setToolTipText("Please Put Detailed Notes!");
+        JScrollPane scrollPane3 = new JScrollPane(plandInt.get(clientNum)); 
+        scrollPane3.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane3.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane3.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane3.setBorder(BorderFactory.createTitledBorder("Planned Intervention"));
+        scrollPane3.setBackground(new Color(152,215,215));
+        minipanel.add(scrollPane3);
         
         
-        pane.setBorder(BorderFactory.createTitledBorder(title));
+        pane.setBorder(BorderFactory.createTitledBorder(
+                new LineBorder(new Color(0,0,0)),
+                "Note",
+                TitledBorder.LEFT,
+                TitledBorder.BELOW_TOP));
+        pane.setBackground(new Color(152,215,215));
         pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
         pane.setAlignmentX(LEFT_ALIGNMENT);
         pane.add(minipanel, pane);
@@ -163,10 +221,11 @@ public class NoteMaker extends JPanel{
         NoteMaker newContentPane = new NoteMaker();
         newContentPane.setOpaque(true);
         frame.setContentPane(newContentPane);
- 
         frame.pack();
         frame.setVisible(true);
     }
+    
+
     
     /*
      * when the button is clicked, the information is read from the GUI and the input files and the schedule is created
@@ -196,7 +255,9 @@ public class Send extends AbstractAction{
     		bufferedWriter.write(serviceTypes.get(i).getSelectedItem() + "~");
     		bufferedWriter.write(signed.get(i).isSelected() + "~");
     		bufferedWriter.write(notSigned.get(i).isSelected() + "~");
-    		bufferedWriter.write(notes.get(i).getText() + "~");
+    		bufferedWriter.write(seshFocus.get(i).getText() + "~");
+    		bufferedWriter.write(theraInt.get(i).getText() + "~");
+    		bufferedWriter.write(plandInt.get(i).getText() + "~");
     		bufferedWriter.newLine();
     	}
     	
@@ -228,8 +289,9 @@ public class NewNote extends AbstractAction{
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		try {
+		/*try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			//UIManager.setLookAndFeel("com.sun.java.swing.plaf.macintosh.MacintoshLookAndFeel");
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -242,7 +304,7 @@ public class NewNote extends AbstractAction{
 		} catch (UnsupportedLookAndFeelException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 createAndShowGUI();
