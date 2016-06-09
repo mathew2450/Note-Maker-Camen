@@ -1,6 +1,2 @@
 Client Name~Time In~Time Out~Location~Service Type~Signed~Not Signed~Notes
-~5:00 AM~5:00 AM~Primary Location~0-No Service Type~false~true~~~~
-~5:00 AM~5:00 AM~Primary Location~0-No Service Type~false~true~~~~
-~5:00 AM~5:00 AM~Primary Location~0-No Service Type~false~true~~~~
-~5:00 AM~5:00 AM~Primary Location~0-No Service Type~false~true~~~~
-~5:00 AM~5:00 AM~Primary Location~0-No Service Type~false~true~~~~
+Mathew Cross~Nathan Cross~5:30 AM~2:15 PM~Home Services~15-Private BA -Applied Behavior Assistant-~true~aga adftry ~adfg ert ary asf a~dga bnfgjuiafdg asdg   ~

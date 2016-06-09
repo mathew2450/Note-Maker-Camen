@@ -1,36 +1,42 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import javax.swing.*;
-import javax.swing.border.*;
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 
 
 @SuppressWarnings("serial")
-public class NoteMaker extends JPanel{
-	
+public class SigningPage extends JPanel{
+
 	JPanel mainPanel = new JPanel();
 	Action send;
 	Action newNote;
 	ArrayList<JCheckBox> signed = new ArrayList<JCheckBox>();
-	ArrayList<JCheckBox> notSigned = new ArrayList<JCheckBox>();
+	ArrayList<JCheckBox> authorized = new ArrayList<JCheckBox>();
 	ArrayList<JTextField> clientNames = new ArrayList<JTextField>();
 	ArrayList<JTextField> employeeNames = new ArrayList<JTextField>();
 	ArrayList<JTextArea> seshFocus = new ArrayList<JTextArea>();
@@ -64,7 +70,7 @@ public class NoteMaker extends JPanel{
 					"19-Private Level 3","20-Admin"};
 	JComboBox<String> serviceTypeSelect;
 	
-	public NoteMaker() {
+	public SigningPage() {
 		super(new BorderLayout());
         send = new Send();
         newNote = new NewNote();
@@ -128,37 +134,44 @@ public class NoteMaker extends JPanel{
         employeeNames.get(clientNum).setToolTipText("FirstName LastName");        
         employeeNames.get(clientNum).setBorder(BorderFactory.createTitledBorder(new LineBorder(Color.black),"Employee Name",TitledBorder.LEFT,TitledBorder.ABOVE_TOP)); 
         employeeNames.get(clientNum).setBackground(new Color(152,215,215));
+        employeeNames.get(clientNum).setEditable(false);
         minipanel.add(employeeNames.get(clientNum));
         
         clientNames.add(clientNum, new JTextField(12));
         clientNames.get(clientNum).setToolTipText("FirstName LastName");
         clientNames.get(clientNum).setBorder(BorderFactory.createTitledBorder(new LineBorder(Color.black),"Client Name",TitledBorder.LEFT,TitledBorder.ABOVE_TOP)); 
         clientNames.get(clientNum).setBackground(new Color(152,215,215));
+        clientNames.get(clientNum).setEditable(false);
         minipanel.add(clientNames.get(clientNum));
         
         timeIn.add(clientNum, timeSelect = new JComboBox<String>(time));
         timeIn.get(clientNum).setBorder(BorderFactory.createTitledBorder("Time In"));
         timeIn.get(clientNum).setBackground(new Color(152,215,215));
+        timeIn.get(clientNum).setEditable(false);
         minipanel.add(timeIn.get(clientNum));
         
         timeOut.add(clientNum, timeSelect = new JComboBox<String>(time));
         timeOut.get(clientNum).setBorder(BorderFactory.createTitledBorder("Time Out"));
         timeOut.get(clientNum).setBackground(new Color(152,215,215));
+        timeOut.get(clientNum).setEditable(false);
         minipanel.add(timeOut.get(clientNum));
         
         locations.add(clientNum, locationSelect = new JComboBox<String>(location));
         locations.get(clientNum).setBorder(BorderFactory.createTitledBorder("Location"));
         locations.get(clientNum).setBackground(new Color(152,215,215));
+        locations.get(clientNum).setEditable(false);
         minipanel.add(locations.get(clientNum));
         
         serviceTypes.add(clientNum, serviceTypeSelect = new JComboBox<String>(serviceType));
         serviceTypes.get(clientNum).setBorder(BorderFactory.createTitledBorder("Service Type"));
         serviceTypes.get(clientNum).setBackground(new Color(152,215,215));
+        serviceTypes.get(clientNum).setEditable(false);
         minipanel.add(serviceTypes.get(clientNum));
         
         signed.add(clientNum, new JCheckBox("Check Here to Sign"));
         signed.get(clientNum).setBorder(BorderFactory.createLineBorder(Color.black));
         signed.get(clientNum).setBackground(new Color(152,215,215));
+        signed.get(clientNum).setEnabled(false);
         minipanel.add(signed.get(clientNum));       
         
         seshFocus.add(clientNum, new JTextArea(5, 30)); 
@@ -171,6 +184,7 @@ public class NoteMaker extends JPanel{
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Session Focus"));
         scrollPane.setBackground(new Color(152,215,215));
+        seshFocus.get(clientNum).setEditable(false);
         minipanel.add(scrollPane); 
         
         theraInt.add(clientNum, new JTextArea(5, 30)); 
@@ -183,6 +197,7 @@ public class NoteMaker extends JPanel{
         scrollPane2.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane2.setBorder(BorderFactory.createTitledBorder("Theraeputic Intervention"));
         scrollPane2.setBackground(new Color(152,215,215));
+        theraInt.get(clientNum).setEditable(false);
         minipanel.add(scrollPane2);
         
         plandInt.add(clientNum, new JTextArea(5, 30)); 
@@ -195,7 +210,13 @@ public class NoteMaker extends JPanel{
         scrollPane3.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane3.setBorder(BorderFactory.createTitledBorder("Planned Intervention"));
         scrollPane3.setBackground(new Color(152,215,215));
+        plandInt.get(clientNum).setEditable(false);
         minipanel.add(scrollPane3);
+        
+        authorized.add(clientNum, new JCheckBox("Check Here to Authorize"));
+        authorized.get(clientNum).setBorder(BorderFactory.createLineBorder(Color.black));
+        authorized.get(clientNum).setBackground(new Color(152,215,215));
+        minipanel.add(authorized.get(clientNum)); 
         
         
         pane.setBorder(BorderFactory.createTitledBorder(
@@ -218,7 +239,7 @@ public class NoteMaker extends JPanel{
         JFrame frame = new JFrame("Note Maker");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  
-        NoteMaker newContentPane = new NoteMaker();
+        SigningPage newContentPane = new SigningPage();
         newContentPane.setOpaque(true);
         frame.setContentPane(newContentPane);
         frame.pack();
@@ -233,39 +254,41 @@ public class NoteMaker extends JPanel{
      */
 public class Send extends AbstractAction{
 	public void actionPerformed(ActionEvent e) {
+		
 		try {
 			System.out.println("sent");
-			FileWriter fileWriter;
-			fileWriter = new FileWriter("TEMP_NOTES.txt");
+			FileReader fileReader;
+			fileReader = new FileReader("TEMP_NOTES.txt");
 		
 		
-    	BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+    	BufferedReader bufferedWriter = new BufferedReader(fileReader);
+    	bufferedWriter.readLine();
+    	String newNote = bufferedWriter.readLine();
     	
-    	bufferedWriter.write("Client Name~" + "Time In~" + "Time Out~" + "Location~" + "Service Type~" + "Signed~" + "Not Signed~" 
-    							+ "Notes");
-    	bufferedWriter.newLine();
+    	String[] prsdString = newNote.split("~");
     	
-    	for(int i = 0; i < clientNum; i++){
-    		System.out.println(i);
-    		bufferedWriter.write(employeeNames.get(i).getText() + "~");
-    		bufferedWriter.write(clientNames.get(i).getText() + "~");
-    		bufferedWriter.write(timeIn.get(i).getSelectedItem() + "~");
-    		bufferedWriter.write(timeOut.get(i).getSelectedItem() + "~");
-    		bufferedWriter.write(locations.get(i).getSelectedItem() + "~");
-    		bufferedWriter.write(serviceTypes.get(i).getSelectedItem() + "~");
-    		bufferedWriter.write(signed.get(i).isSelected() + "~");
-    		bufferedWriter.write(seshFocus.get(i).getText() + "~");
-    		bufferedWriter.write(theraInt.get(i).getText() + "~");
-    		bufferedWriter.write(plandInt.get(i).getText() + "~");
-    		bufferedWriter.newLine();
+    	for(int i = 0; i < prsdString.length; i++){
+    		System.out.println(i + " " + prsdString[i]);
     	}
-    	
+		employeeNames.get(0).setText(prsdString[0]);
+		clientNames.get(0).setText(prsdString[1]);
+		timeIn.get(0).setSelectedItem(prsdString[2]);
+		timeOut.get(0).setSelectedItem(prsdString[3]);
+		locations.get(0).setSelectedItem(prsdString[4]);
+		serviceTypes.get(0).setSelectedItem(prsdString[5]);
+		if(prsdString[6].equals(true))
+			signed.get(0).setSelected(true);
+		else
+			signed.get(0).setSelected(false);
+		seshFocus.get(0).setText(prsdString[7]);
+		theraInt.get(0).setText(prsdString[8]);
+		plandInt.get(0).setText(prsdString[9]);  	
+    	 	
     	bufferedWriter.close();
     	} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		};//end catch
-		
 
     }
 }
