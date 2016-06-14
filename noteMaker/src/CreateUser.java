@@ -28,39 +28,36 @@ import java.sql.*;
 
 
 
-public class MainPanel {
+public class CreateUser {
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
 	static final String DB_URL = "jdbc:mysql://192.168.2.4:3306/Camen_Info";
 	static Properties loginDetails = new Properties();
-	static String USER;
-	static String PASS;
+	{
+	try (FileReader in = new FileReader("login.properties")) {
+	    loginDetails.load(in);} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	static final String USER = loginDetails.getProperty("username");
+	static final String PASS = loginDetails.getProperty("password");
     JFrame frame = new JFrame();
     JPanel mainPanel = new JPanel();
     JPanel logoutPanel = new JPanel();
 	boolean approved = false;
 	Action login, logout;
     JTextField uName = new JTextField(15);
-    static JPasswordField pass = new JPasswordField(15);
+    JPasswordField pass = new JPasswordField(15);
+    JPasswordField passConf = new JPasswordField(15);
     JTabbedPane tabbedPane = new JTabbedPane();
     NoteMaker nm = new NoteMaker();
     SigningPage sp = new SigningPage();
 
-    public MainPanel() {
-    	final Properties loginDetails = new Properties();
-    	{
-    	try (FileReader in = new FileReader("login.properties")) {
-    		System.out.println("prop file completed");
-    	    loginDetails.load(in);} catch (FileNotFoundException e) {
-    			// TODO Auto-generated catch block
-    			e.printStackTrace();
-    		} catch (IOException e) {
-    			// TODO Auto-generated catch block
-    			e.printStackTrace();
-    		}
-    	}
-    	USER = loginDetails.getProperty("username");
-    	PASS = loginDetails.getProperty("password");
+    public CreateUser() {
     	login = new Login();
     	logout = new Logout();
         createLoginPage();
@@ -109,13 +106,10 @@ public class MainPanel {
 	public class Login extends AbstractAction{
 		public void actionPerformed(ActionEvent e) {
 	        char[] input = pass.getPassword();
-	        System.out.println(input);
-	        String inputs = new String(input);
-	        System.out.println(inputs);
-	        String hash = BCrypt.hashpw(inputs, BCrypt.gensalt());
+	        String origPass = input.toString();
+	        String hash = BCrypt.hashpw(origPass, BCrypt.gensalt());
 	        System.out.println(hash);
-	        String origPass = getPassHash(uName.getText(), hash);
-	        if (BCrypt.checkpw(inputs, origPass)) {
+	        if (BCrypt.checkpw(origPass, hash)) {
 	            JOptionPane.showMessageDialog(mainPanel,
 	                "Success! You typed the right password.");
 	            tabbedPane.add("Note Maker", nm);
@@ -123,13 +117,15 @@ public class MainPanel {
 	            tabbedPane.add("Logout", logoutPanel);
 	            frame.getContentPane().add(tabbedPane);	            	
 	        } else {
-	        	System.out.println(origPass + " " + hash);
 	            JOptionPane.showMessageDialog(mainPanel,
 	                "Invalid password. Try again.",
 	                "Error Message",
 	                JOptionPane.ERROR_MESSAGE);
 	           
 	        }
+
+	        //Zero out the possible password, for security.
+	        Arrays.fill(input, '0');
 
 	        pass.selectAll();
 	        pass.requestFocus();
@@ -167,9 +163,8 @@ public class MainPanel {
 	    return isCorrect;
 	}
 	
-	
-	private static String getPassHash(String username, String hash){
-		Connection conn = null;
+	private static void connect(){
+		   Connection conn = null;
 		   Statement stmt = null;
 		   try{
 		      //STEP 2: Register JDBC driver
@@ -178,20 +173,6 @@ public class MainPanel {
 		      //STEP 3: Open a connection
 		      System.out.println("Connecting to database...");
 		      conn = DriverManager.getConnection(DB_URL,USER,PASS);
-		      stmt = conn.createStatement();
-		      String sql;
-		      //sql = "UPDATE `Employees` SET `pass`= '" + password + "' WHERE `username` = '" + username + "'";
-		      //int pu = stmt.executeUpdate(sql);
-		      sql = "SELECT pass FROM Employees WHERE username = '" + username + "'";
-		      ResultSet rs = stmt.executeQuery(sql);
-		      rs.next();
-		      hash = rs.getString("pass");
-		      //System.out.println(password);
-		      //password = BCrypt.hashpw(password, BCrypt.gensalt());
-		      rs.close();
-		      stmt.close();
-		      conn.close();
-		      return hash;
 		   }catch(SQLException se){
 		      //Handle errors for JDBC
 		      se.printStackTrace();
@@ -212,14 +193,14 @@ public class MainPanel {
 		         se.printStackTrace();
 		      }//end finally try
 		   }//end try
-		return(null);	
+		   System.out.println("Goodbye!");
 	}
 
     /*
      * Create the GUI and show it. 
      */
     private static void createAndShowGUI() {
-        new MainPanel();      
+        new CreateUser();      
     }
     
 	/**
