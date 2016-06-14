@@ -45,6 +45,7 @@ public class MainPanel {
     JTabbedPane tabbedPane = new JTabbedPane();
     NoteMaker nm = new NoteMaker();
     SigningPage sp = new SigningPage();
+    CreateUser cu = new CreateUser();
 
     public MainPanel() {
     	final Properties loginDetails = new Properties();
@@ -121,6 +122,7 @@ public class MainPanel {
 	            tabbedPane.add("Note Maker", nm);
 	            tabbedPane.add("Note Authorizer", sp);
 	            tabbedPane.add("Logout", logoutPanel);
+	            tabbedPane.add("Create User", cu);
 	            frame.getContentPane().add(tabbedPane);	            	
 	        } else {
 	        	System.out.println(origPass + " " + hash);
@@ -146,25 +148,9 @@ public class MainPanel {
 			tabbedPane.remove(nm);
 			tabbedPane.remove(sp);
 			tabbedPane.remove(logoutPanel);
+			tabbedPane.remove(cu);
 	    
 		}
-	}
-	
-	@SuppressWarnings("unused")
-	private static boolean isPasswordCorrect(char[] input) {
-	    boolean isCorrect = true;
-	    char[] correctPassword = { 'g', 't', 'i', 'v', 'r', '6' };
-
-	    if (input.length != correctPassword.length) {
-	        isCorrect = false;
-	    } else {
-	        isCorrect = Arrays.equals (input, correctPassword);
-	    }
-
-	    //Zero out the password.
-	    Arrays.fill(correctPassword,'0');
-
-	    return isCorrect;
 	}
 	
 	

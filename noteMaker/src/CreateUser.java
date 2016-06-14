@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -28,12 +29,23 @@ import java.sql.*;
 
 
 
-public class CreateUser {
+@SuppressWarnings("serial")
+public class CreateUser extends JPanel{
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
 	static final String DB_URL = "jdbc:mysql://192.168.2.4:3306/Camen_Info";
 	static Properties loginDetails = new Properties();
-	{
+	private static String USER, PASS;
+    JPanel createUPanel = new JPanel();
+	Action login, logout, createUser;
+    JTextField uName = new JTextField(15);
+    JPasswordField pass = new JPasswordField(15);
+    JPasswordField passConf = new JPasswordField(15);
+    JTextField phoneNum = new JTextField(10);
+
+
+    public CreateUser() {	
+    	
 	try (FileReader in = new FileReader("login.properties")) {
 	    loginDetails.load(in);} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -42,87 +54,58 @@ public class CreateUser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	static final String USER = loginDetails.getProperty("username");
-	static final String PASS = loginDetails.getProperty("password");
-    JFrame frame = new JFrame();
-    JPanel mainPanel = new JPanel();
-    JPanel logoutPanel = new JPanel();
-	boolean approved = false;
-	Action login, logout;
-    JTextField uName = new JTextField(15);
-    JPasswordField pass = new JPasswordField(15);
-    JPasswordField passConf = new JPasswordField(15);
-    JTabbedPane tabbedPane = new JTabbedPane();
-    NoteMaker nm = new NoteMaker();
-    SigningPage sp = new SigningPage();
-
-    public CreateUser() {
-    	login = new Login();
-    	logout = new Logout();
-        createLoginPage();
-        createLogoutPage();
-    	tabbedPane.add("Login", mainPanel);
-        frame.getContentPane().add(tabbedPane);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(1700, 1000);
-        // frame.pack();
-        frame.setLocationByPlatform(true);
-        frame.setVisible(true);
+	USER = loginDetails.getProperty("username");
+	PASS = loginDetails.getProperty("password");
+        createUserPage();
+        add(createUPanel);
     }
     
-    public void createLogoutPage(){
+    public void createUserPage(){
     	JLabel contentPane = new JLabel();
         ImageIcon icon = new ImageIcon("camenLogo.png");
         contentPane.setIcon(icon);
         contentPane.setOpaque(true);
-        logoutPanel.add(contentPane);
-        logoutPanel.setBackground(Color.white);
-        logoutPanel.setOpaque(true);
-        JButton logoutb = new JButton(logout);
-        logoutb.setText("Logout");
-        logoutPanel.add(logoutb);
-    }
-    
-    public void createLoginPage(){
-    	JLabel contentPane = new JLabel();
-        ImageIcon icon = new ImageIcon("camenLogo.png");
-        contentPane.setIcon(icon);
-        contentPane.setOpaque(true);
-        mainPanel.add(contentPane);
-        mainPanel.setBackground(Color.white);
-        mainPanel.setOpaque(true);
-        JButton loginb = new JButton(login);
-        loginb.setText("Login");
-        mainPanel.add(loginb);
-        mainPanel.add(new JLabel("Username:"));
-        mainPanel.add(uName);
-        mainPanel.add(new JLabel("Password:"));
-        mainPanel.add(pass);
+        createUPanel.add(contentPane);
+        createUPanel.setBackground(Color.white);
+        createUPanel.setOpaque(true);
+        createUser = new CreateUserA();
+        JButton createU = new JButton(createUser);
+        createU.setText("Create User");
+        createUPanel.add(createU);        
+        createUPanel.add(new JLabel("Username:"));
+        createUPanel.add(uName);
+        createUPanel.add(new JLabel("Password:"));
+        createUPanel.add(pass);
+        createUPanel.add(new JLabel("Confirm Password:"));
+        createUPanel.add(passConf);
+        createUPanel.add(new JLabel("Phone Number:"));
+        createUPanel.add(phoneNum);
     }
     
 
-	@SuppressWarnings("serial")
-	public class Login extends AbstractAction{
+	public class CreateUserA extends AbstractAction{
 		public void actionPerformed(ActionEvent e) {
 	        char[] input = pass.getPassword();
-	        String origPass = input.toString();
+	        char[] inputConf = passConf.getPassword();
+	        String origPass = new String(input);
+	        String passc = new String(inputConf);
+	        if(!origPass.equals(passc))
+	        {
+	        	JOptionPane.showMessageDialog(createUPanel,
+		                "Passwords Do Not Match. Try again.",
+		                "Error Message",
+		                JOptionPane.ERROR_MESSAGE);
+		        pass.selectAll();
+		        pass.requestFocus();
+		        pass.setText("");
+		        passConf.selectAll();
+		        passConf.requestFocus();
+		        passConf.setText("");
+	        	return;
+	        }
 	        String hash = BCrypt.hashpw(origPass, BCrypt.gensalt());
 	        System.out.println(hash);
-	        if (BCrypt.checkpw(origPass, hash)) {
-	            JOptionPane.showMessageDialog(mainPanel,
-	                "Success! You typed the right password.");
-	            tabbedPane.add("Note Maker", nm);
-	            tabbedPane.add("Note Authorizer", sp);
-	            tabbedPane.add("Logout", logoutPanel);
-	            frame.getContentPane().add(tabbedPane);	            	
-	        } else {
-	            JOptionPane.showMessageDialog(mainPanel,
-	                "Invalid password. Try again.",
-	                "Error Message",
-	                JOptionPane.ERROR_MESSAGE);
-	           
-	        }
+	        addUser(uName.getText(), hash, phoneNum.getText());
 
 	        //Zero out the possible password, for security.
 	        Arrays.fill(input, '0');
@@ -130,41 +113,21 @@ public class CreateUser {
 	        pass.selectAll();
 	        pass.requestFocus();
 	        pass.setText("");
+	        passConf.selectAll();
+	        passConf.requestFocus();
+	        passConf.setText("");
+	        phoneNum.selectAll();
+	        phoneNum.requestFocus();
+	        phoneNum.setText("");
+	        uName.selectAll();
+	        uName.requestFocus();
+	        uName.setText("");
 	    
 		}
 	}
 	
-	@SuppressWarnings("serial")
-	public class Logout extends AbstractAction{
-		public void actionPerformed(ActionEvent e) {
-			JOptionPane.showMessageDialog(mainPanel,
-	                "Logging Out!");
-			tabbedPane.remove(nm);
-			tabbedPane.remove(sp);
-			tabbedPane.remove(logoutPanel);
-	    
-		}
-	}
-	
-	@SuppressWarnings("unused")
-	private static boolean isPasswordCorrect(char[] input) {
-	    boolean isCorrect = true;
-	    char[] correctPassword = { 'g', 't', 'i', 'v', 'r', '6' };
-
-	    if (input.length != correctPassword.length) {
-	        isCorrect = false;
-	    } else {
-	        isCorrect = Arrays.equals (input, correctPassword);
-	    }
-
-	    //Zero out the password.
-	    Arrays.fill(correctPassword,'0');
-
-	    return isCorrect;
-	}
-	
-	private static void connect(){
-		   Connection conn = null;
+	private static String addUser(String username, String hash, String phoneNum){
+		Connection conn = null;
 		   Statement stmt = null;
 		   try{
 		      //STEP 2: Register JDBC driver
@@ -173,6 +136,19 @@ public class CreateUser {
 		      //STEP 3: Open a connection
 		      System.out.println("Connecting to database...");
 		      conn = DriverManager.getConnection(DB_URL,USER,PASS);
+		      stmt = conn.createStatement();
+		      String sql;
+		      //sql = "UPDATE `Employees` SET `pass`= '" + password + "' WHERE `username` = '" + username + "'";
+		      //int pu = stmt.executeUpdate(sql);
+		      sql = "INSERT INTO `Employees` (`Employee Name`, `Employee Level`, " +
+		    		  "`Employee Phone`, `pass`, `username`) VALUES" +
+		    		  "('Jimmy Carter', '2', '" + phoneNum + "', '" + hash + "', '" + username + "')";
+		      stmt.executeUpdate(sql);
+		      //System.out.println(password);
+		      //password = BCrypt.hashpw(password, BCrypt.gensalt());
+		      stmt.close();
+		      conn.close();
+		      return hash;
 		   }catch(SQLException se){
 		      //Handle errors for JDBC
 		      se.printStackTrace();
@@ -193,7 +169,7 @@ public class CreateUser {
 		         se.printStackTrace();
 		      }//end finally try
 		   }//end try
-		   System.out.println("Goodbye!");
+		return(null);	
 	}
 
     /*
