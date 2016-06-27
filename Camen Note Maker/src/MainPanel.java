@@ -1,3 +1,16 @@
+/*
+ * ******THINGS_TO_ADD******
+ * NEED TO SET UP A CHANGE
+ * PASSWORD TAB
+ * 
+ * NEED TO ADD TAB FOR NOTE
+ * FIXING WITH INPUT FOR 
+ * UNIQUE NOTE ID THAT WILL 
+ * AUTOFILL THE OLD NOT INFO
+ * 
+ * NEED TO IMPLEMENT USER
+ * LEVEL RESTRICTIONS
+ */
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -5,7 +18,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -17,7 +29,6 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-
 import org.mindrot.jbcrypt.BCrypt;
 
 

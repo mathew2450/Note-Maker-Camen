@@ -1,14 +1,26 @@
+/*
+ * ******THINGS_TO_ADD*********
+ * NEED TO SET UP A UNIQUE ID
+ * FOR EACH OF THE NOTES SO 
+ * THAT DUPLICATES ARE NOT 
+ * UPLOADED TO THE DB
+ * 
+ * ADD AUTOFILL TO THE STAFF
+ * NAME AND CLIENT NAMES
+ * 
+ * ADD SIGNITURES FOR THE STAFF
+*/
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.event.ActionEvent;
-import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -21,11 +33,9 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-
-
-
 @SuppressWarnings("serial")
 public class NoteMaker extends JPanel{
+	Calendar rightNow = Calendar.getInstance();
 	static DBConnect dbc = new DBConnect();
 	JPanel mainPanel = new JPanel();
 	Action send;
@@ -37,7 +47,7 @@ public class NoteMaker extends JPanel{
 	ArrayList<JTextArea> futRec = new ArrayList<JTextArea>();
 	ArrayList<JTextArea> target = new ArrayList<JTextArea>();
 	ArrayList<JTextArea> repProg = new ArrayList<JTextArea>();
-	ArrayList<Date> dates = new ArrayList<Date>();
+	ArrayList<String> dates = new ArrayList<String>();
 	ArrayList<Integer> qhs = new ArrayList<Integer>();
 	int sig = 0;
 	 ArrayList<JFormattedTextField> signitures = new ArrayList<JFormattedTextField>();
@@ -66,10 +76,10 @@ public class NoteMaker extends JPanel{
 	JComboBox<String> timeSelect;
 	String[] year = new String[]{"1999","2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020"};
 	JComboBox<String> yearSelect;
-	String[] day = new String[]{"01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22",
+	String[] day = new String[]{"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22",
 				"23","24","25","26","27","28","29","30","31"};
 	JComboBox<String> daySelect;
-	String[] month = new String[]{"01","02","03","04","05","06","07","08","09","10","11","12"};
+	String[] month = new String[]{"1","2","3","4","5","6","7","8","9","10","11","12"};
 	JComboBox<String> monthSelect;
 	String[] serviceType = new String[]{"0-No Service Type","1-Behavior Assessment","2-Behavior Assessment WV", "3-Behavior Therapy, BA",
 			"4-Behavior Therapy, BA WV", "5-Behavior Therapy BA, Indirect", "6-Behavior Therapy, Level 1", "7-Behavior Therapy, Level 1 WV", 
@@ -120,10 +130,9 @@ public class NoteMaker extends JPanel{
         this.setForeground(Color.white);
 	}
 	
-	@SuppressWarnings("deprecation")
+
 	protected JPanel createClientInfoPanel() {
         JPanel pane = new JPanel();
-        
         JComponent minipanel = new JPanel();
         Dimension size = new Dimension(1400, 220);
         minipanel.setAlignmentX(LEFT_ALIGNMENT);
@@ -173,19 +182,22 @@ public class NoteMaker extends JPanel{
         minipanel.add(serviceTypes.get(clientNum));
         
         years.add(clientNum, yearSelect = new JComboBox<String>(year));
+        years.get(clientNum).setSelectedItem(String.valueOf(rightNow.get(Calendar.YEAR)));
         years.get(clientNum).setBorder(BorderFactory.createTitledBorder("YYYY"));
         years.get(clientNum).setBackground(new Color(152,215,215));
         minipanel.add(years.get(clientNum));
         
-        days.add(clientNum, daySelect = new JComboBox<String>(day));
-        days.get(clientNum).setBorder(BorderFactory.createTitledBorder("DD"));
-        days.get(clientNum).setBackground(new Color(152,215,215));
-        minipanel.add(days.get(clientNum));
-        
         months.add(clientNum, monthSelect = new JComboBox<String>(month));
+        months.get(clientNum).setSelectedItem(String.valueOf(rightNow.get(Calendar.MONTH)));
         months.get(clientNum).setBorder(BorderFactory.createTitledBorder("MM"));
         months.get(clientNum).setBackground(new Color(152,215,215));
         minipanel.add(months.get(clientNum));
+        
+        days.add(clientNum, daySelect = new JComboBox<String>(day));
+        days.get(clientNum).setSelectedItem(String.valueOf(rightNow.get(Calendar.DAY_OF_MONTH)));
+        days.get(clientNum).setBorder(BorderFactory.createTitledBorder("DD"));
+        days.get(clientNum).setBackground(new Color(152,215,215));
+        minipanel.add(days.get(clientNum));
         
         signed.add(clientNum, new JCheckBox("Check Here to Sign"));
         signed.get(clientNum).setBorder(BorderFactory.createLineBorder(Color.black));
@@ -240,11 +252,6 @@ public class NoteMaker extends JPanel{
         scrollPane4.setBackground(new Color(152,215,215));
         minipanel.add(scrollPane4);
         
-        dates.add(clientNum, new Date(Integer.parseInt(years.get(clientNum).getSelectedItem().toString()), 
-        		Integer.parseInt(months.get(clientNum).getSelectedItem().toString()), 
-        		Integer.parseInt(days.get(clientNum).getSelectedItem().toString())));
-        qhs.add(clientNum, calcHours(timeIn.get(clientNum).getSelectedItem().toString(), timeOut.get(clientNum).getSelectedItem().toString()));
-        
         pane.setBorder(BorderFactory.createTitledBorder(
                 new LineBorder(new Color(0,0,0)),
                 "Note",
@@ -280,13 +287,18 @@ public class NoteMaker extends JPanel{
      */
 public class Send extends AbstractAction{
 	public void actionPerformed(ActionEvent e) {		
-		   Connection conn = dbc.getConnection();
+
 		   Statement stmt = dbc.getStatement();
 		   
 
 		   try{
 			   
-			   for(int i =0; i< clientNum; i++){		   
+			   for(int i =0; i< clientNum; i++){
+				   String dateNum = (years.get(i).getSelectedItem().toString() + "-" +
+						   months.get(i).getSelectedItem().toString() + "-" + 
+						   days.get(i).getSelectedItem().toString());
+			        dates.add(i, dateNum);
+			        qhs.add(i, calcHours(timeIn.get(i).getSelectedItem().toString(), timeOut.get(i).getSelectedItem().toString()));
 				   if(signed.get(i).isSelected() == true)
 					   sig = 1;
 				   else
@@ -309,23 +321,8 @@ public class Send extends AbstractAction{
 		   }catch(Exception fe){
 		      //Handle errors for Class.forName
 		      fe.printStackTrace();
-		   }finally{
-		      //finally block used to close resources
-		      try{
-		         if(stmt!=null)
-		            stmt.close();
-		      }catch(SQLException se2){
-		      }// nothing we can do
-		      try{
-		         if(conn!=null)
-		            conn.close();
-		      }catch(SQLException se){
-		         se.printStackTrace();
-		      }//end finally try
-		   }//end try	
-		
-
-    }
+		   }	
+		  }//end try	
 }
 	
 	
