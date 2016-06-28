@@ -1,17 +1,3 @@
-/*
- * ******THINGS_TO_ADD*********
- * NEED TO SET UP A UNIQUE ID
- * FOR EACH OF THE NOTES SO 
- * THAT DUPLICATES ARE NOT 
- * UPLOADED TO THE DB
- * 
- * CONFIGURE FOR VARIABLE EMAIL
- * ADDRESSES SO THAT THE CORRECT
- * PERSON IS EMAILED
- * 
- * ADD SIGNITURES FOR THE STAFF
-*/
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -23,26 +9,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-public class SigningPage extends JPanel{
+public class ReviseNote extends JPanel{
 	Calendar rightNow = Calendar.getInstance();
 	static DBConnect dbc = new DBConnect();
 	int panelNum = 0; 
 	JPanel mainPanel = new JPanel();
 	Action send;
 	Action newNote;
+	JTextField noteid = new JTextField(12);
 	ArrayList<JCheckBox> signed = new ArrayList<JCheckBox>();
 	ArrayList<JTextArea> comments = new ArrayList<JTextArea>();
 	ArrayList<JTextField> clientNames = new ArrayList<JTextField>();
@@ -94,7 +70,7 @@ public class SigningPage extends JPanel{
 					"19-Private Level 3","20-Admin"};
 	JComboBox<String> serviceTypeSelect;
 	
-	public SigningPage() {
+	public ReviseNote() {
 		super(new BorderLayout());
         send = new Send();
         newNote = new NewNote();
@@ -107,8 +83,9 @@ public class SigningPage extends JPanel{
         
         JButton addNote = new JButton(newNote);
         addNote.setText("Get Next Note");
+
         JButton sendNote = new JButton(send);
-        sendNote.setText("Finish Authorization");
+        sendNote.setText("Send Revised Note");
    
         //BoxLayout layout = new BoxLayout(mainPanel, BoxLayout.Y_AXIS);
         //mainPanel.setLayout(layout);
@@ -153,6 +130,12 @@ public class SigningPage extends JPanel{
                                   TitledBorder.BELOW_TOP);
         border.setTitleColor(Color.black);
         minipanel.setBorder(border);
+        
+        noteid = new JTextField(12);
+        noteid.setToolTipText("NoteID******");
+        noteid.setBorder(BorderFactory.createTitledBorder(new LineBorder(Color.black),"NoteID",TitledBorder.LEFT,TitledBorder.ABOVE_TOP)); ;
+        noteid.setBackground(new Color(152,215,215));
+        minipanel.add(noteid);
         
         employeeNames.add(clientNum, new JTextField(12));
         employeeNames.get(clientNum).setToolTipText("FirstName LastName");        
@@ -286,11 +269,11 @@ public class SigningPage extends JPanel{
     /*
      * Create the GUI and show it. 
      */
-    private static void createAndShowGUI() {
-        JFrame frame = new JFrame("Note Authorizer");
+    private static void createAndShowGUI() { 
+        JFrame frame = new JFrame("Note Reviser");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  
-        SigningPage newContentPane = new SigningPage();
+        ReviseNote newContentPane = new ReviseNote();
         newContentPane.setOpaque(true);
         frame.setContentPane(newContentPane);
         frame.pack();
@@ -306,67 +289,51 @@ public class SigningPage extends JPanel{
 public class Send extends AbstractAction{
 	public void actionPerformed(ActionEvent e) {		
 
-		   Statement stmt = dbc.getStatement();
-		   
+		Statement stmt = dbc.getStatement();
+        if (JOptionPane.showConfirmDialog(mainPanel, 
+                "By Clicking Yes You Are Electronically Signing The Note(s) As Complete And True", "Ready To Send?", 
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
 
 		   try{
-			   String sql;			  
-			   sql = "DELETE FROM `NewNotes` WHERE `NewNotes`.`NoteID` = '"+noteID.get(clientNum)+"';";
-			   stmt.executeUpdate(sql);  
-
-				   if(signed.get(clientNum).isSelected() == true){
-					   System.out.println("Approved");
+			   
+			   for(int i =0; i< clientNum; i++){
+				   String dateNum = (years.get(i).getSelectedItem().toString() + "-" +
+						   months.get(i).getSelectedItem().toString() + "-" + 
+						   days.get(i).getSelectedItem().toString());
+			        dates.add(i, dateNum);
+			        qhs.add(i, calcHours(timeIn.get(i).getSelectedItem().toString(), timeOut.get(i).getSelectedItem().toString()));
+				   if(signed.get(i).isSelected() == true)
 					   sig = 1;
-				   
-				   String dateNum = (years.get(clientNum).getSelectedItem().toString() + "-" +
-						   months.get(clientNum).getSelectedItem().toString() + "-" + 
-						   days.get(clientNum).getSelectedItem().toString());
-			        dates.add(clientNum, dateNum);
-			        qhs.add(clientNum, calcHours(timeIn.get(clientNum).getSelectedItem().toString(), timeOut.get(clientNum).getSelectedItem().toString()));
- 
-		      
-		      sql = "INSERT INTO `SavedNotes` (`EName`, `CName`, `TIn`, `TOut`, `Loc`, `SType`, `Sign`, `BIPDate`,"+
-		    		  " `Date`, `QH`, `Target`, `RepProg`, `SessDesc`, `FutRec`, `NoteID`, `Comments`) VALUES" +
-		    		  "('" + employeeNames.get(clientNum).getText() + "', '" + clientNames.get(clientNum).getText() + 
-		    		  "', '" + timeIn.get(clientNum).getSelectedItem() + "', '" + timeOut.get(clientNum).getSelectedItem() +   
-		    		  "', '" + locations.get(clientNum).getSelectedItem().toString() + "', '" + serviceTypes.get(clientNum).getSelectedItem().toString() + 
-		    		  "', '" + sig + "',NULL, '" + dates.get(clientNum) + 
-		    		  "', '" + qhs.get(clientNum) + "', '" + target.get(clientNum).getText() + "', '" + repProg.get(clientNum).getText() + "', '" + seshFocus.get(clientNum).getText() + 
-		    		  "', '" + futRec.get(clientNum).getText() + "', '" + noteID.get(clientNum) + "', '" + comments.get(clientNum).getText() +"')";
-		      stmt.executeUpdate(sql);
-		      
-				   }
-			   else{
-				   System.out.println("Denied");
+				   else
 					   sig = 0;
-					   String dateNum = (years.get(clientNum).getSelectedItem().toString() + "-" +
-							   months.get(clientNum).getSelectedItem().toString() + "-" + 
-							   days.get(clientNum).getSelectedItem().toString());
-				        dates.add(clientNum, dateNum);
-				        qhs.add(clientNum, calcHours(timeIn.get(clientNum).getSelectedItem().toString(), timeOut.get(clientNum).getSelectedItem().toString()));
-					   
-			      sql = "INSERT INTO `BadNotes` (`EName`, `CName`, `TIn`, `TOut`, `Loc`, `SType`, `Sign`, `BIPDate`,"+
-			    		  " `Date`, `QH`, `Target`, `RepProg`, `SessDesc`, `FutRec`, `NoteID`, `Comments`) VALUES" +
-			    		  "('" + employeeNames.get(clientNum).getText() + "', '" + clientNames.get(clientNum).getText() + 
-			    		  "', '" + timeIn.get(clientNum).getSelectedItem() + "', '" + timeOut.get(clientNum).getSelectedItem() +   
-			    		  "', '" + locations.get(clientNum).getSelectedItem().toString() + "', '" + serviceTypes.get(clientNum).getSelectedItem().toString() + 
-			    		  "', '" + sig + "',NULL, '" + dates.get(clientNum) + 
-			    		  "', '" + qhs.get(clientNum) + "', '" + target.get(clientNum).getText() + "', '" + repProg.get(clientNum).getText() + "', '" + seshFocus.get(clientNum).getText() + 
-			    		  "', '" + futRec.get(clientNum).getText() + "', '" + noteID.get(clientNum) + "', '" + comments.get(clientNum).getText() + "')";
-			      stmt.executeUpdate(sql);
-					   @SuppressWarnings("unused")
-					SendEmail email = new SendEmail(comments.get(clientNum).getText(), noteID.get(clientNum), employeeNames.get(clientNum).getText());
+		      String sql;
+		      sql = "INSERT INTO `NewNotes` (`EName`, `CName`, `TIn`, `TOut`, `Loc`, `SType`, `Sign`, `BIPDate`,"+
+		    		  " `Date`, `QH`, `Target`, `RepProg`, `SessDesc`, `FutRec`, `NoteID`) VALUES" +
+		    		  "('" + employeeNames.get(i).getText() + "', '" + clientNames.get(i).getText() + 
+		    		  "', '" + timeIn.get(i).getSelectedItem() + "', '" + timeOut.get(i).getSelectedItem() +   
+		    		  "', '" + locations.get(i).getSelectedItem().toString() + "', '" + serviceTypes.get(i).getSelectedItem().toString() + 
+		    		  "', '" + sig + "',NULL, '" + dates.get(i) + 
+		    		  "', '" + qhs.get(i) + "', '" + target.get(i).getText() + "', '" + repProg.get(i).getText() + "', '" + seshFocus.get(i).getText() + 
+		    		  "', '" + futRec.get(i).getText() + "', '" + noteID.get(i) + "')";
+		      //System.out.println(sql);
+		      stmt.executeUpdate(sql);
 			   }
-				   
 		   }catch(SQLException se){
 		      //Handle errors for JDBC
 		      se.printStackTrace();
 		   }catch(Exception fe){
 		      //Handle errors for Class.forName
 		      fe.printStackTrace();
-		   }	
-		   getNextNote();
+		   }
+		   for(int i = 1; i<clientNum+1; i++){
+			   mainPanel.remove(1);  
+		   }
+		    clientNum = 0;
+		    mainPanel.revalidate();
+		    mainPanel.repaint();
 		  }//end try	
+}
 }
 	
 	
@@ -393,7 +360,7 @@ public void getNextNote(){
 	   try{
 
 	      String sql;
-	      sql = "SELECT * FROM `NewNotes` WHERE 1";
+	      sql = "SELECT * FROM `BadNotes` WHERE 1";
 	      ResultSet rs = stmt.executeQuery(sql);
 	      rs.next();
 	      employeeNames.get(clientNum).setText(rs.getString("EName"));
@@ -407,6 +374,8 @@ public void getNextNote(){
 		  seshFocus.get(clientNum).setText(rs.getString("SessDesc")); 
 		  futRec.get(clientNum).setText(rs.getString("FutRec"));
 		  noteID.add(clientNum, rs.getString("NoteID"));
+		  comments.get(clientNum).setText(rs.getString("Comments"));
+		  
 		   
 	   }catch(SQLException se){
 	      //Handle errors for JDBC

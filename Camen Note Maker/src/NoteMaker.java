@@ -21,17 +21,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
 public class NoteMaker extends JPanel{
@@ -49,6 +38,7 @@ public class NoteMaker extends JPanel{
 	ArrayList<JTextArea> repProg = new ArrayList<JTextArea>();
 	ArrayList<String> dates = new ArrayList<String>();
 	ArrayList<Integer> qhs = new ArrayList<Integer>();
+	ArrayList<String> noteID = new ArrayList<String>();
 	int sig = 0;
 	 ArrayList<JFormattedTextField> signitures = new ArrayList<JFormattedTextField>();
 	@SuppressWarnings("rawtypes")
@@ -68,11 +58,11 @@ public class NoteMaker extends JPanel{
 	int clientNum = 0;
 	String[] location = new String[]{"Primary Location", "Home Services"};
 	JComboBox<String> locationSelect;
-	String[] time = new String[]{"5:00 AM","5:15 AM","5:30 AM","5:45 AM","6:00 AM","6:15 AM","6:30 AM","6:45 AM","7:00 AM","7:15 AM","7:30 AM","7:45 AM",
+	String[] time = new String[]{"6:00 AM","6:15 AM","6:30 AM","6:45 AM","7:00 AM","7:15 AM","7:30 AM","7:45 AM",
 			"8:00 AM","8:15 AM","8:30 AM","8:45 AM","9:00 AM","9:15 AM","9:30 AM","9:45 AM","10:00 AM","10:15 AM","10:30 AM","10:45 AM","11:00 AM","11:15 AM","11:30 AM","11:45 AM",
 			"12:00 PM","12:15 PM","12:30 PM","12:45 PM","1:00 PM","1:15 PM","1:30 PM","1:45 PM","2:00 PM","2:15 PM","2:30 PM","2:45 PM","3:00 PM","3:15 PM","3:30 PM","3:45 PM",
 			"4:00 PM","4:15 PM","4:30 PM","4:45 PM","5:00 PM","5:15 PM","5:30 PM","5:45 PM","6:00 PM","6:15 PM","6:30 PM","6:45 PM","7:00 PM","7:15 PM","7:30 PM","7:45 PM",
-			"8:00 PM","8:15 PM","8:30 PM","8:45 PM","9:00 PM","9:15 PM","9:30 PM","9:45 PM","10:00 PM","10:15 PM","10:30 PM","10:45 PM","11:00 PM","11:15 PM","11:30 PM","11:45 PM","12:00 AM"};
+			"8:00 PM","8:15 PM","8:30 PM","8:45 PM","9:00 PM","9:15 PM","9:30 PM","9:45 PM"};
 	JComboBox<String> timeSelect;
 	String[] year = new String[]{"1999","2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020"};
 	JComboBox<String> yearSelect;
@@ -287,7 +277,12 @@ public class NoteMaker extends JPanel{
      */
 public class Send extends AbstractAction{
 	public void actionPerformed(ActionEvent e) {		
+        if (JOptionPane.showConfirmDialog(mainPanel, 
+                "By Clicking Yes You Are Electronically Signing The Note(s) As Complete And True", "Ready To Send?", 
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
 
+            
 		   Statement stmt = dbc.getStatement();
 		   
 
@@ -305,13 +300,13 @@ public class Send extends AbstractAction{
 					   sig = 0;
 		      String sql;
 		      sql = "INSERT INTO `NewNotes` (`EName`, `CName`, `TIn`, `TOut`, `Loc`, `SType`, `Sign`, `BIPDate`,"+
-		    		  " `Date`, `QH`, `Target`, `RepProg`, `SessDesc`, `FutRec`) VALUES" +
+		    		  " `Date`, `QH`, `Target`, `RepProg`, `SessDesc`, `FutRec`, `NoteID`) VALUES" +
 		    		  "('" + employeeNames.get(i).getText() + "', '" + clientNames.get(i).getText() + 
 		    		  "', '" + timeIn.get(i).getSelectedItem() + "', '" + timeOut.get(i).getSelectedItem() +   
 		    		  "', '" + locations.get(i).getSelectedItem().toString() + "', '" + serviceTypes.get(i).getSelectedItem().toString() + 
 		    		  "', '" + sig + "',NULL, '" + dates.get(i) + 
 		    		  "', '" + qhs.get(i) + "', '" + target.get(i).getText() + "', '" + repProg.get(i).getText() + "', '" + seshFocus.get(i).getText() + 
-		    		  "', '" + futRec.get(i).getText() + "')";
+		    		  "', '" + futRec.get(i).getText() + "', '" + noteID.get(i) + "')";
 		      //System.out.println(sql);
 		      stmt.executeUpdate(sql);
 			   }
@@ -321,10 +316,16 @@ public class Send extends AbstractAction{
 		   }catch(Exception fe){
 		      //Handle errors for Class.forName
 		      fe.printStackTrace();
-		   }	
+		   }
+		   for(int i = 1; i<clientNum+1; i++){
+			   mainPanel.remove(1);  
+		   }
+		    clientNum = 0;
+		    mainPanel.revalidate();
+		    mainPanel.repaint();
 		  }//end try	
 }
-	
+}
 	
     /*
      * Adds a new panel for client information
@@ -333,6 +334,11 @@ public class NewNote extends AbstractAction{
     public void actionPerformed(ActionEvent e) {
     	mainPanel.add(createClientInfoPanel());
     	mainPanel.revalidate();
+    	int random1 = (int )(Math.random() * 50 + 1);
+    	int random = (int )(Math.random() * 50 + 1);
+    	int random3 = (int )(Math.random() * 50 + 1);
+    	noteID.add(clientNum, "NoteID" + random + random3 + random1);
+    	System.out.println(noteID.get(clientNum));
     	clientNum++;
     }
     }

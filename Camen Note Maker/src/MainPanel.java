@@ -36,6 +36,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class MainPanel {
 	DBConnect dbc = new DBConnect();
+	static int usrLvl = 0; 
     JFrame frame = new JFrame();
     JPanel mainPanel = new JPanel();
     JPanel logoutPanel = new JPanel();
@@ -47,6 +48,7 @@ public class MainPanel {
     NoteMaker nm = new NoteMaker();
     SigningPage sp = new SigningPage();
     CreateUser cu = new CreateUser();
+    ReviseNote rn = new ReviseNote();
 	static Connection conn;
 	static Statement stmt;
 
@@ -128,10 +130,24 @@ public class MainPanel {
 	        if (BCrypt.checkpw(inputs, origPass)) {
 	            JOptionPane.showMessageDialog(mainPanel,
 	                "Success! You typed the right password.");
-	            tabbedPane.add("Note Maker", nm);
-	            tabbedPane.add("Note Authorizer", sp);
-	            tabbedPane.add("Logout", logoutPanel);
-	            tabbedPane.add("Create User", cu);
+	            if(usrLvl == 1){
+	            	tabbedPane.add("Note Maker", nm);
+	            	tabbedPane.add("Logout", logoutPanel);
+	            	tabbedPane.add("Revise Note", rn);
+	            }
+	            if(usrLvl == 2){
+	            	tabbedPane.add("Note Maker", nm);
+	            	tabbedPane.add("Logout", logoutPanel);
+	            	tabbedPane.add("Note Authorizer", sp);
+	            	tabbedPane.add("Revise Note", rn);
+	            }
+	            if(usrLvl >= 3){
+	            	tabbedPane.add("Note Maker", nm);
+	            	tabbedPane.add("Logout", logoutPanel);
+	            	tabbedPane.add("Note Authorizer", sp);
+	            	tabbedPane.add("Create User", cu);
+	            	tabbedPane.add("Revise Note", rn);
+	            }
 	            frame.getContentPane().add(tabbedPane);	            	
 	        } else {
 	        	System.out.println(origPass + " " + hash);
@@ -167,10 +183,11 @@ public class MainPanel {
 	private static String getPassHash(String username, String hash){
 		String sql;
 		   try{
-		      sql = "SELECT pass FROM Employees WHERE username = '" + username + "'";
+		      sql = "SELECT * FROM Employees WHERE username = '" + username + "'";
 		      ResultSet rs = stmt.executeQuery(sql);
 		      rs.next();
 		      hash = rs.getString("pass");
+		      usrLvl = rs.getInt("Employee Level");
 		      //System.out.println(password);
 		      //password = BCrypt.hashpw(password, BCrypt.gensalt());
 		      rs.close();

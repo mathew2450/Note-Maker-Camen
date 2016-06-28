@@ -3,13 +3,14 @@ import javax.mail.*;
 import javax.mail.internet.*;
 
 public class SendEmail {
+	String eol = System.getProperty("line.separator");
 
-    SendEmail(String body) {
+    SendEmail(String body, String noteID, String name) {
         final String username = "camentech@yahoo.com";
         final String password = "136MwC448";
         final String recipient = "holycow2450@gmail.com";
-        final String subject = "Note Comments";
-        final String emailmessage = body;
+        final String subject = "Note Needs Revising " + noteID;
+        final String emailmessage = "Hello " + name + "," + eol + "     " + body + eol + "Thank you," + eol + "     Camen Tech";
  
         Properties props = new Properties();
         props.put("mail.smtp.starttls.enable", "true");
